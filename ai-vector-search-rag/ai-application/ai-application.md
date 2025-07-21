@@ -12,7 +12,8 @@ In this lab, you will:
 - Prepare Oracle APEX environment and import the demo application.
 - Make small adjustments for the application to run in your workspace.
 
-If the documents you plan to test with the demo application are scanned or contain images with text graphics, you can use optical character recognition (OCR) before the embedding process.
+If the documents you plan to test with the demo application are scanned or contain images with text graphics, you can use optical character recognition (OCR) before the embedding process. Once you import your documents into the database, it is recommended to convert them to Markdown format, but this is not mandatory.
+Why Markdown? Because LLMs understand Markdown better than other text formats. Created to be an easy-to-write and easy-to-read text format for humans, Markdown has become an ideal choice for creating content that is LLM-friendly. Compared to other formats like XML and JSON, Markdown has a straightforward syntax, which makes it easy for both humans and machines to parse.
 
 [AI Vector Search on scanned documents and images](youtube:-0g1W61RhTI)
 
@@ -471,11 +472,11 @@ This lab assumes you have the following:
     -- Post authenticate procedure
     <copy>
     CREATE OR REPLACE EDITIONABLE PROCEDURE post_authenticate (
-        p_username in varchar2,
-        out_user_id out number,
-        out_time_zone out varchar2,
+      p_username in varchar2,
+      out_user_id out number,
+      out_time_zone out varchar2,
       out_role_id out number,
-        out_locked out number
+      out_locked out number
     )
     is
       l_id        number;
@@ -572,7 +573,7 @@ This lab assumes you have the following:
     ````
 
     ````sql
-    -- Tokens to connect to 3rd party cloud services
+    -- Access Tokens to connect to 3rd party cloud services
     <copy>
     CREATE TABLE ACCESS_TOKENS
     ("ACCESS_TOKEN" VARCHAR2(1024 CHAR) NOT NULL ENABLE,
@@ -730,8 +731,8 @@ This lab assumes you have the following:
     begin
     -- escape special characters and Oracle Text reserved words from Token
     select trim(REGEXP_REPLACE(' ' || REGEXP_REPLACE(TOKEN,'("|\\|\*|_|&|%|-|\$|>)','\\\1') || ' ',
-                                                    '\W*(pattern)\W*|\W*(fuzzy)\W*|\W(and)\W|\W(or)\W',' {\1\2\3\4} ',
-                                                    1, 0, 'i')) into L_TOKEN 
+                               '\W*(pattern)\W*|\W*(fuzzy)\W*|\W(and)\W|\W(or)\W',' {\1\2\3\4} ',
+                               1, 0, 'i')) into L_TOKEN 
     from TOKENS where ID = L_TOKEN_ID;
     delete from DOCS_TOKENS_REF where TOKEN_ID = L_TOKEN_ID;
     insert into DOCS_TOKENS_REF
@@ -753,8 +754,8 @@ This lab assumes you have the following:
     begin
     -- escape special characters and Oracle Text reserved words from Token
     select trim(REGEXP_REPLACE(' ' || REGEXP_REPLACE(TOKEN,'("|\\|\*|_|&|%|-|\$|>)','\\\1') || ' ',
-                                                    '\W*(pattern)\W*|\W*(fuzzy)\W*|\W(and)\W|\W(or)\W',' {\1\2\3\4} ',
-                                                    1, 0, 'i')) into L_TOKEN 
+                               '\W*(pattern)\W*|\W*(fuzzy)\W*|\W(and)\W|\W(or)\W',' {\1\2\3\4} ',
+                               1, 0, 'i')) into L_TOKEN 
     from TOKENS where ID = L_TOKEN_ID;
     delete from VECTORS_TOKENS_REF where TOKEN_ID = L_TOKEN_ID;
     insert into VECTORS_TOKENS_REF
@@ -778,9 +779,10 @@ This lab assumes you have the following:
     delete from DOCS_TOKENS_REF where BLOBDOC_ID = L_BLOBDOC_ID;
     delete from VECTORS_TOKENS_REF where VECTOR_ID in (select ID from VECTORS where BLOBDOC_ID = L_BLOBDOC_ID);
     -- escape special characters and Oracle Text reserved words from Token
-    for rec in (select ID, trim(REGEXP_REPLACE(' ' || REGEXP_REPLACE(TOKEN,'("|\\|\*|_|&|%|-|\$|>)','\\\1') || ' ',
-                                                '\W*(pattern)\W*|\W*(fuzzy)\W*|\W(and)\W|\W(or)\W',' {\1\2\3\4} ',
-                                                1, 0, 'i')) as L_TOKEN from TOKENS) loop
+    for rec in (
+        select ID, trim(REGEXP_REPLACE(' ' || REGEXP_REPLACE(TOKEN,'("|\\|\*|_|&|%|-|\$|>)','\\\1') || ' ',
+                                       '\W*(pattern)\W*|\W*(fuzzy)\W*|\W(and)\W|\W(or)\W',' {\1\2\3\4} ',
+                                       1, 0, 'i')) as L_TOKEN from TOKENS) loop
     begin
         -- insert new references
         insert into DOCS_TOKENS_REF
@@ -872,7 +874,9 @@ This lab assumes you have the following:
     ````
     https://YourObjStorageNamespace.objectstorage.uk-london-1.oci.customer-oci.com
     https://objectstorage.uk-london-1.oraclecloud.com
+    https://document.aiservice.uk-london-1.oci.oraclecloud.com
     ````
+    - Prompt On Install: ON
 
     ![create web credentials](./images/create-web-credentials.png " ")
 
